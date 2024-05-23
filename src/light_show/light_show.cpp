@@ -9,8 +9,7 @@ static int rgb_loop_direction = 1;
 
 void light_show_init() {
     Serial.begin(9600);
-    leds_init();
-    timer_init();
+    yboard_init();
 }
 
 void light_show_loop() {

@@ -38,8 +38,7 @@ State *DecreaseChannelState = machine.addState(&decrease_channel_state);
 
 void wifi_sniffer_init() {
     Serial.begin(9600);
-    leds_init();
-    timer_init();
+    yboard_init();
 
     // Set up WiFi hardware
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();

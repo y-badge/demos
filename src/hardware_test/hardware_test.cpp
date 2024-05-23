@@ -2,8 +2,7 @@
 
 void hardware_test_init() {
     Serial.begin(9600);
-    leds_init();
-    timer_init();
+    yboard_init();
 }
 
 /*
