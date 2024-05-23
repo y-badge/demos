@@ -2,7 +2,7 @@
 #define LIGHT_SHOW_H
 
 #include "Arduino.h"
-#include "ybadge.h"
+#include "yboard.h"
 
 // Required functions
 void light_show_init();

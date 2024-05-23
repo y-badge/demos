@@ -2,7 +2,7 @@
 #define WIFI_SNIFFER_H
 
 #include "Arduino.h"
-#include "ybadge.h"
+#include "yboard.h"
 
 // Required functions
 void wifi_sniffer_init();
