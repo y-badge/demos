@@ -16,7 +16,7 @@ void hardware_test_init() {
 void hardware_test_loop() {
     if (buttons_get(1)) {
         while (buttons_get(1)) {
-            all_leds_set_color(255, 0, 0);
+            leds_set_color_all(255, 0, 0);
             leds_set_brightness(get_brightness());
             if (check_switches()) {
                 speaker_play_note(NOTE_C4, 10);
@@ -25,7 +25,7 @@ void hardware_test_loop() {
         }
     } else if (buttons_get(2)) {
         while (buttons_get(2)) {
-            all_leds_set_color(255, 255, 0);
+            leds_set_color_all(255, 255, 0);
             leds_set_brightness(get_brightness());
             if (check_switches()) {
                 speaker_play_note(NOTE_D4, 10);
@@ -34,7 +34,7 @@ void hardware_test_loop() {
         }
     } else if (buttons_get(3)) {
         while (buttons_get(3)) {
-            all_leds_set_color(0, 255, 0);
+            leds_set_color_all(0, 255, 0);
             leds_set_brightness(get_brightness());
             if (check_switches()) {
                 speaker_play_note(NOTE_E4, 10);
@@ -42,7 +42,7 @@ void hardware_test_loop() {
             }
         }
     } else {
-        all_leds_set_color(255, 255, 255);
+        leds_set_color_all(255, 255, 255);
         leds_set_brightness(get_brightness());
     }
 }

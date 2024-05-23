@@ -73,7 +73,7 @@ void color_wipe(byte red, byte green, byte blue, int SpeedDelay) {
 }
 
 void rgb_loop() {
-    all_leds_set_color(0, rgb_loop_state, rgb_loop_state);
+    leds_set_color_all(0, rgb_loop_state, rgb_loop_state);
 
     // Switch between increasing and decreasing
     if (rgb_loop_state >= 255 || rgb_loop_state <= 0) {

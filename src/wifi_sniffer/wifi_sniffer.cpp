@@ -111,10 +111,10 @@ void sniff_state() {
             RGBColor color = color_wheel(value);
 
             // Light up LEDs
-            all_leds_set_color(color.red, color.green, color.blue);
+            leds_set_color_all(color.red, color.green, color.blue);
         } else {
             // Turn off LEDs
-            all_leds_set_color(0, 0, 0);
+            leds_set_color_all(0, 0, 0);
         }
     } else {
         // If the first switch is not set, use the color as an indication of signal strength
@@ -130,7 +130,7 @@ void sniff_state() {
             RGBColor color = blue_to_red(value);
 
             // Light up LEDs
-            all_leds_set_color(color.red, color.green, color.blue);
+            leds_set_color_all(color.red, color.green, color.blue);
         }
     }
 }
