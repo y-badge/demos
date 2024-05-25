@@ -1,8 +1,11 @@
 #include "hardware_test.h"
 
-void hardware_test_init() {
+static YBoard *yboard;
+
+void hardware_test_init(YBoard *yb) {
     Serial.begin(9600);
-    yboard_init();
+    yboard = yb;
+    yboard->setup();
 }
 
 /*
@@ -13,41 +16,50 @@ void hardware_test_init() {
  * knob.
  */
 void hardware_test_loop() {
-    if (buttons_get(1)) {
-        while (buttons_get(1)) {
-            leds_set_color_all(255, 0, 0);
-            leds_set_brightness(get_brightness());
+    if (yboard->get_button(1)) {
+        while (yboard->get_button(1)) {
+            yboard->set_all_leds_color(255, 0, 0);
+            yboard->set_led_brightness(get_brightness());
             if (check_switches()) {
-                speaker_play_note(NOTE_C4, 10);
+                play_note(NOTE_C4, 10);
                 delay(10);
             }
         }
-    } else if (buttons_get(2)) {
-        while (buttons_get(2)) {
-            leds_set_color_all(255, 255, 0);
-            leds_set_brightness(get_brightness());
+    } else if (yboard->get_button(2)) {
+        while (yboard->get_button(2)) {
+            yboard->set_all_leds_color(255, 255, 0);
+            yboard->set_led_brightness(get_brightness());
             if (check_switches()) {
-                speaker_play_note(NOTE_D4, 10);
+                play_note(NOTE_D4, 10);
                 delay(10);
             }
         }
-    } else if (buttons_get(3)) {
-        while (buttons_get(3)) {
-            leds_set_color_all(0, 255, 0);
-            leds_set_brightness(get_brightness());
+    } else if (yboard->get_button(3)) {
+        while (yboard->get_button(3)) {
+            yboard->set_all_leds_color(0, 255, 0);
+            yboard->set_led_brightness(get_brightness());
             if (check_switches()) {
-                speaker_play_note(NOTE_E4, 10);
+                play_note(NOTE_E4, 10);
                 delay(10);
             }
         }
     } else {
-        leds_set_color_all(255, 255, 255);
-        leds_set_brightness(get_brightness());
+        yboard->set_all_leds_color(255, 255, 255);
+        yboard->set_led_brightness(get_brightness());
     }
 }
 
 // This function converts the knob's output (1-100) to a brightness value (0-255)
-int get_brightness() { return map(knob_get(), 0, 100, 0, 255); }
+int get_brightness() { return map(yboard->get_knob(), 0, 100, 0, 255); }
 
 // This function checks if either of the switches are on
-bool check_switches() { return switches_get(1) || switches_get(2); }
+bool check_switches() { return yboard->get_switch(1) || yboard->get_switch(2); }
+
+void play_note(unsigned int freq, unsigned long duration) {
+    if (yboard->get_type() == YBoard::BoardType::v2) {
+        YBoardv2 *v2 = (YBoardv2 *)yboard;
+        v2->play_note(freq, duration);
+    } else {
+        Serial.println("This function is not implemented on version 3.");
+    }
+}
