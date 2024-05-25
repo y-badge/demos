@@ -5,7 +5,7 @@
 #include "yboard.h"
 
 // Required functions
-void light_show_init();
+void light_show_init(YBoard *yb);
 void light_show_loop();
 
 // Helper functions

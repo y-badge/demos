@@ -1,27 +1,31 @@
 #include "light_show.h"
 #include "colors.h"
 
+static YBoard *yboard;
+
 static int rainbow_cycle_state = 0;
 static int running_lights_state = 0;
 static int color_wipe_state = 0;
 static int rgb_loop_state = 0;
 static int rgb_loop_direction = 1;
 
-void light_show_init() {
+void light_show_init(YBoard *yb) {
     Serial.begin(9600);
-    yboard_init();
+
+    yboard = yb;
+    yboard->setup();
 }
 
 void light_show_loop() {
     // Update brightness of LEDs based on knob
-    int brightness = map(knob_get(), 0, 100, 0, 255);
-    leds_set_brightness(brightness);
+    int brightness = map(yboard->get_knob(), 0, 100, 0, 255);
+    yboard->set_led_brightness(brightness);
 
-    if (switches_get(1) && switches_get(2)) {
+    if (yboard->get_switch(1) && yboard->get_switch(2)) {
         rainbow_cycle();
-    } else if (switches_get(1) && !switches_get(2)) {
+    } else if (yboard->get_switch(1) && !yboard->get_switch(2)) {
         running_lights(255, 255, 255, 20);
-    } else if (!switches_get(1) && switches_get(2)) {
+    } else if (!yboard->get_switch(1) && yboard->get_switch(2)) {
         color_wipe(0, 0, 255, 25);
     } else {
         rgb_loop();
@@ -31,9 +35,9 @@ void light_show_loop() {
 void rainbow_cycle() {
     RGBColor c;
 
-    for (int i = 1; i < LED_COUNT + 1; i++) {
-        c = color_wheel(((i * 256 / LED_COUNT) + rainbow_cycle_state) & 255);
-        leds_set_color(i, c.red, c.green, c.blue);
+    for (int i = 0; i < yboard->get_led_count(); i++) {
+        c = color_wheel(((i * 256 / yboard->get_led_count()) + rainbow_cycle_state) & 255);
+        yboard->set_led_color(i, c.red, c.green, c.blue);
     }
 
     if (rainbow_cycle_state >= 256) {
@@ -46,23 +50,23 @@ void rainbow_cycle() {
 void running_lights(byte red, byte green, byte blue, int WaveDelay) {
     running_lights_state++; // = 0; //Position + Rate;
 
-    for (int i = 1; i < LED_COUNT + 1; i++) {
-        leds_set_color(i, ((sin(i + running_lights_state) * 127 + 128) / 255) * red,
-                       ((sin(i + running_lights_state) * 127 + 128) / 255) * green,
-                       ((sin(i + running_lights_state) * 127 + 128) / 255) * blue);
+    for (int i = 0; i < yboard->get_led_count(); i++) {
+        yboard->set_led_color(i, ((sin(i + running_lights_state) * 127 + 128) / 255) * red,
+                              ((sin(i + running_lights_state) * 127 + 128) / 255) * green,
+                              ((sin(i + running_lights_state) * 127 + 128) / 255) * blue);
     }
 
     delay(WaveDelay);
 }
 
 void color_wipe(byte red, byte green, byte blue, int SpeedDelay) {
-    if (color_wipe_state < LED_COUNT + 1) {
-        leds_set_color(color_wipe_state, red, green, blue);
+    if (color_wipe_state < yboard->get_led_count() + 1) {
+        yboard->set_led_color(color_wipe_state, red, green, blue);
     } else {
-        leds_set_color(color_wipe_state - LED_COUNT, 255, 255, 255);
+        yboard->set_led_color(color_wipe_state - yboard->get_led_count(), 255, 255, 255);
     }
 
-    if (color_wipe_state >= (LED_COUNT * 2)) {
+    if (color_wipe_state >= (yboard->get_led_count() * 2)) {
         color_wipe_state = 1;
     } else {
         color_wipe_state++;
@@ -72,7 +76,7 @@ void color_wipe(byte red, byte green, byte blue, int SpeedDelay) {
 }
 
 void rgb_loop() {
-    leds_set_color_all(0, rgb_loop_state, rgb_loop_state);
+    yboard->set_all_leds_color(0, rgb_loop_state, rgb_loop_state);
 
     // Switch between increasing and decreasing
     if (rgb_loop_state >= 255 || rgb_loop_state <= 0) {
