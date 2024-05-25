@@ -57,7 +57,7 @@ bool check_switches() { return yboard->get_switch(1) || yboard->get_switch(2); }
 
 void play_note(unsigned int freq, unsigned long duration) {
     if (yboard->get_type() == YBoard::BoardType::v2) {
-        YBoardv2 *v2 = (YBoardv2 *)yboard;
+        YBoardV2 *v2 = (YBoardV2 *)yboard;
         v2->play_note(freq, duration);
     } else {
         Serial.println("This function is not implemented on version 3.");

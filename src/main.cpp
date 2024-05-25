@@ -4,7 +4,7 @@
 #include "light_show/light_show.h"
 #include "wifi_sniffer/wifi_sniffer.h"
 
-YBoardv2 yboard;
+YBoardV2 yboard;
 
 void setup() {
     // wifi_sniffer_init(&yboard);
