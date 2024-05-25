@@ -56,10 +56,10 @@ void wifi_sniffer_init(YBoard *yb) {
 
     // Set up state machine transitions
     SniffState->addTransition([]() { return yboard->get_switch(1); }, AdjustChannelState);
-    AdjustChannelState->addTransition([]() { return yboard->get_button(3); }, IncreaseChannelState);
+    AdjustChannelState->addTransition([]() { return yboard->get_button(2); }, IncreaseChannelState);
     AdjustChannelState->addTransition([]() { return yboard->get_button(1); }, DecreaseChannelState);
     AdjustChannelState->addTransition([]() { return !yboard->get_switch(1); }, SniffState);
-    IncreaseChannelState->addTransition([]() { return !yboard->get_button(3); },
+    IncreaseChannelState->addTransition([]() { return !yboard->get_button(2); },
                                         AdjustChannelState);
     DecreaseChannelState->addTransition([]() { return !yboard->get_button(1); },
                                         AdjustChannelState);
