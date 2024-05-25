@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "yboardv2.h"
 
 #include "hardware_test/hardware_test.h"
