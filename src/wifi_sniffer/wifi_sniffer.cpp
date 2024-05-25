@@ -36,9 +36,13 @@ State *AdjustChannelState = machine.addState(&adjust_channel_state);
 State *IncreaseChannelState = machine.addState(&increase_channel_state);
 State *DecreaseChannelState = machine.addState(&decrease_channel_state);
 
-void wifi_sniffer_init() {
+static YBoard *yboard;
+
+void wifi_sniffer_init(YBoard *yb) {
     Serial.begin(9600);
-    yboard_init();
+
+    yboard = yb;
+    yboard->setup();
 
     // Set up WiFi hardware
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -51,12 +55,14 @@ void wifi_sniffer_init() {
     esp_wifi_set_channel(current_channel, WIFI_SECOND_CHAN_NONE);
 
     // Set up state machine transitions
-    SniffState->addTransition([]() { return switches_get(1); }, AdjustChannelState);
-    AdjustChannelState->addTransition([]() { return buttons_get(3); }, IncreaseChannelState);
-    AdjustChannelState->addTransition([]() { return buttons_get(1); }, DecreaseChannelState);
-    AdjustChannelState->addTransition([]() { return !switches_get(1); }, SniffState);
-    IncreaseChannelState->addTransition([]() { return !buttons_get(3); }, AdjustChannelState);
-    DecreaseChannelState->addTransition([]() { return !buttons_get(1); }, AdjustChannelState);
+    SniffState->addTransition([]() { return yboard->get_switch(1); }, AdjustChannelState);
+    AdjustChannelState->addTransition([]() { return yboard->get_button(3); }, IncreaseChannelState);
+    AdjustChannelState->addTransition([]() { return yboard->get_button(1); }, DecreaseChannelState);
+    AdjustChannelState->addTransition([]() { return !yboard->get_switch(1); }, SniffState);
+    IncreaseChannelState->addTransition([]() { return !yboard->get_button(3); },
+                                        AdjustChannelState);
+    DecreaseChannelState->addTransition([]() { return !yboard->get_button(1); },
+                                        AdjustChannelState);
 }
 
 void wifi_sniffer_loop() { machine.run(); }
@@ -94,10 +100,10 @@ void sniff_state() {
     }
 
     // Update brightness of LEDs based on knob
-    int brightness = map(knob_get(), 0, 100, 0, 255);
-    leds_set_brightness(brightness);
+    int brightness = map(yboard->get_knob(), 0, 100, 0, 255);
+    yboard->set_led_brightness(brightness);
 
-    if (switches_get(2)) {
+    if (yboard->get_switch(2)) {
         // If the first switch is set, blink the LDS for every frame sniffed
 
         if (sniffed_packet) {
@@ -110,10 +116,10 @@ void sniff_state() {
             RGBColor color = color_wheel(value);
 
             // Light up LEDs
-            leds_set_color_all(color.red, color.green, color.blue);
+            yboard->set_all_leds_color(color.red, color.green, color.blue);
         } else {
             // Turn off LEDs
-            leds_set_color_all(0, 0, 0);
+            yboard->set_all_leds_color(0, 0, 0);
         }
     } else {
         // If the first switch is not set, use the color as an indication of signal strength
@@ -129,7 +135,7 @@ void sniff_state() {
             RGBColor color = blue_to_red(value);
 
             // Light up LEDs
-            leds_set_color_all(color.red, color.green, color.blue);
+            yboard->set_all_leds_color(color.red, color.green, color.blue);
         }
     }
 }
@@ -142,11 +148,11 @@ void adjust_channel_state() {
     Serial.println("Adjust channel state");
 
     // Light up the LEDs based on the current channel
-    for (int i = 1; i < LED_COUNT + 1; i++) {
-        if (i <= current_channel) {
-            leds_set_color(i, 255, 255, 255);
+    for (int i = 0; i < yboard->get_led_count(); i++) {
+        if (i <= current_channel - 1) {
+            yboard->set_led_color(i, 255, 255, 255);
         } else {
-            leds_set_color(i, 0, 0, 0);
+            yboard->set_led_color(i, 0, 0, 0);
         }
     }
 }

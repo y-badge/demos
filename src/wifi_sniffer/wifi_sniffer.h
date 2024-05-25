@@ -5,7 +5,7 @@
 #include "yboard.h"
 
 // Required functions
-void wifi_sniffer_init();
+void wifi_sniffer_init(YBoard *yb);
 void wifi_sniffer_loop();
 
 // Callback for when a packet is received
