@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "yboardv2.h"
+#include "yboardv3.h"
 
 // Required functions
 void hardware_test_init(YBoard *yb);
